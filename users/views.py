@@ -12,7 +12,7 @@ class LoginView(APIView):
         email = self.request.data.get("email")
         password = self.request.data.get("password")
 
-        #  유저 정보 불러오기
+        # 유저 정보 불러오기
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:

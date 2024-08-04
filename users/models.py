@@ -45,10 +45,21 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
     """
     사용자 모델
     """
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, verbose_name='이메일')
     nickname = models.CharField(max_length=30, verbose_name='닉네임')
-    is_superuser = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False, verbose_name='최상위 사용자 여부')
 
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+
+
+class UserBalance(TimeStampedModel):
+    """
+    사용자 잔액 모델: 사용자가 보유한 잔액을 저장하는 테이블입니다.
+    """
+    user = models.OneToOneField("users.User", on_delete=models.PROTECT, verbose_name='사용자')
+    balance = models.PositiveIntegerField(default=0, verbose_name='잔액')
+
+    class Meta:
+        verbose_name_plural = '사용자 보유 잔액'
