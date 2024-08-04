@@ -26,6 +26,7 @@ class CardSellRegister(TimeStampedModel):
     card = models.ForeignKey("cards.Card", on_delete=models.PROTECT, verbose_name="카드")
     price = models.PositiveIntegerField(verbose_name="가격")
     fee = models.PositiveIntegerField(verbose_name="수수료")
+    quantity = models.PositiveIntegerField(verbose_name="수량", default=1)
     user = models.ForeignKey("users.User", on_delete=models.PROTECT, verbose_name="판매자")
 
     class Meta:
@@ -51,3 +52,15 @@ class CardBuyHistory(TimeStampedModel):
 
     class Meta:
         verbose_name_plural = "카드 구매 이력"
+
+
+class CardPossesionStatus(TimeStampedModel):
+    """
+    카드 소유 현황 모델: 사용자가 현재 판매중이지 않고 가지고 있는 카드별 개수를 저장하는 테이블입니다.
+    """
+    card = models.ForeignKey("cards.Card", on_delete=models.PROTECT, verbose_name="카드")
+    quantity = models.PositiveIntegerField(verbose_name="판매 가능 수량")
+    user = models.ForeignKey("users.User", on_delete=models.PROTECT, verbose_name="사용자")
+
+    class Meta:
+        verbose_name_plural = "카드 소유 현황"
