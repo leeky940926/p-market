@@ -46,21 +46,6 @@ class UserManager(BaseUserManager):
             raise ValueError('User already exists')
         return user
 
-    def create_superuser(self, email, nickname, password):
-        """
-        주어진 이메일, 닉네임, 비밀번호 등 개인정보로 User 인스턴스 생성
-        단, 최상위 사용자이므로 권한을 부여한다.
-        """
-        user = self.create_user(
-            email=email,
-            password=password,
-            nickname=nickname,
-        )
-
-        user.is_superuser = True
-        user.save(using=self._db)
-        return user
-
 
 class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
     """
