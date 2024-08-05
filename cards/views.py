@@ -27,6 +27,7 @@ from cards.models import (
     CardSellRegister
 )
 from cards.serializers import (
+    CardSellHistoryListSerializer,
     CardSellRegisterListSerializer,
     CardSellRegisterCreateSerializer
 )
@@ -170,3 +171,16 @@ class CardBuyCreateView(APIView):
             )
         data = CardSellRegisterCreateSerializer(card_sell_register).data
         return Response(data=data, status=status.HTTP_201_CREATED)
+
+
+class CardSellHistoryListView(APIView):
+    def get(self, request, *args, **kwargs):
+        card_id = self.kwargs.get("card_id")
+
+        # card_id의 최근 거래가를 5개 조회
+        card_sell_histories = CardSellHistory.objects.filter(
+            card_sell_register__card_id=card_id
+        ).select_related("card_sell_register__card").order_by("-created_at")[:5]
+
+        data = CardSellHistoryListSerializer(card_sell_histories, many=True).data
+        return Response(data=data, status=status.HTTP_200_OK)
