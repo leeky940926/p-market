@@ -1,5 +1,10 @@
-from django.db import models
+from django.db import (
+    models,
+    transaction,
+    IntegrityError
+)
 
+from cards.models import Card, CardPossesionStatus
 from utilities.models import TimeStampedModel
 from django.contrib.auth.models import (
     AbstractBaseUser,
@@ -22,7 +27,23 @@ class UserManager(BaseUserManager):
         )
 
         user.set_password(password)
-        user.save(using=self._db)
+        try:
+            with transaction.atomic():
+                user.save(using=self._db)
+
+                """
+                사용자가 생성되면 사용자의 잔액과 카드 소유 현황을 생성한다.
+                """
+                UserBalance.objects.create(user=user)
+                cards = Card.objects.all()
+                bulk_create_list = [
+                    CardPossesionStatus(
+                        user_id=user.id, card_id=card.id, quantity=0
+                    ) for card in cards
+                ]
+                CardPossesionStatus.objects.bulk_create(bulk_create_list)
+        except IntegrityError:
+            raise ValueError('User already exists')
         return user
 
     def create_superuser(self, email, nickname, password):
